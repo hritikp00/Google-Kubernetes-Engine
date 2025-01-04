@@ -1,30 +1,31 @@
 **Create a sample website using Docker container**	
 
-docker run –d –p 8080:80 nginx:latest
-  # -d Daemon to run container in background
-docker cp index.html <container-id>:/usr/share/nginx/html/
-docker commit <container-id> nginxnew:version1
-docker tag nginxnew:version1 gcr.io/project-id/nginxupdate:version1
-docker push gcr.io/project-id/nginxupdate:version1
+docker run –d –p 8080:80 nginx:latest                                       # -d Daemon to run container in background
+docker ps -a                                                                # List container -a is used for review previous container
+docker cp index.html <container-id>:/usr/share/nginx/html/                  # Replace the nginx html file with your index.html
+docker commit <container-id> nginxnew:version1                              # Commit changes in the conatiner using container-id
+docker tag nginxnew:version1 gcr.io/project-id/nginxupdate:version1         # Tag contianer with new tag-id
+docker push gcr.io/project-id/nginxupdate:version1                          # Push the image with the new tag-id in the Artifact registry of GCP 
 
 **Deploying container in GKE cluster**
 
-gcloud config set project youtube-demo-255723
-gcloud config set compute/zone us-central1-a
+gcloud config set project <project-id>                                      # Set the project-id in the CLI to deploy the GKE Cluster
+gcloud config set compute/zone us-central1-a                                # Set the zone to deploy cluster
 
 **Creating a GKE cluster**
 
-gcloud container clusters create gk-cluster --num-nodes=1
-gcloud container clusters get-credentials gk-cluster
+gcloud container clusters create <cluster-name> --num-nodes=1               #Create cluster with required nodes
+
+gcloud container clusters get-credentials <cluster-name>                    #Authenticate  with Cluster to communicate using kubectl utility
 This command configures kubectl to use the cluster you created.
 
 **Deploying an application to the cluster**
  
-kubectl create deployment web-server --image=gcr.io/ modular-asset-439405-q7/nginxupdate:version1
+kubectl create deployment web-server --image=gcr.io/<project-id>/nginxupdate:version1    #Create deployment using the image stored in Artifact Registry
 
 **Exposing the Deployment**
 
-kubectl expose deployment web-server --type LoadBalancer --port 80 --target-port 80
+kubectl expose deployment web-server --type LoadBalancer --port 80 --target-port 80      #Expose the deployment for public user
 
 **Inspecting and viewing the application**
 
@@ -35,7 +36,8 @@ kubectl expose deployment web-server --type LoadBalancer --port 80 --target-port
              kubectl get service web-server
 
 **To Delete the Cluster**
-gcloud container clusters delete <cluster-name>
+
+gcloud container clusters delete <cluster-name>                #Delete Cluster   
 
 
 
